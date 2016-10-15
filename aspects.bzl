@@ -3,7 +3,7 @@ def _visit_java_provider(target, aspect_ctx):
     """Dump selective info about a visited java_library or java_binary rule into a file"""
     java_provider = target.java
 
-    param = getattr(aspect_ctx.attr, "java_provider_property", "compilation_info")
+    param = getattr(aspect_ctx.attr, "characteristic", "compilation_info")
     if "compilation_info" == param:
         prop = java_provider.compilation_info
         data = struct(
@@ -28,6 +28,18 @@ def _visit_java_provider(target, aspect_ctx):
 
     return [json_file, proto_file]
 
+def _describe(name, obj, exclude):
+    """Print the properties of the given struct obj
+    Args:
+      name: the name of the struct we are introspecting.
+      obj: the struct to introspect
+      exclude: a list of names *not* to print (function names)
+    """
+    for k in dir(obj):
+        if hasattr(obj, k) and k not in exclude:
+            v = getattr(obj, k)
+            t = type(v)
+            print("\n%s.%s<%r> = %s" % (name, k, t, v))
 
 def _info_aspect_impl(target, aspect_ctx):
     """
@@ -42,6 +54,21 @@ def _info_aspect_impl(target, aspect_ctx):
         .output_groups (dict{}): file outputs, partitioned by filetype.
 """
     print("Visiting %s" % target.label)
+    # _describe("target", target, ["output_group"])
+    # _describe("aspect_ctx", aspect_ctx, ["action",
+    #                                      "empty_action",
+    #                                      "expand",
+    #                                      "expand_location",
+    #                                      "expand_make_variables",
+    #                                      "middle_man",
+    #                                      "file_action",
+    #                                      "resolve_command",
+    #                                      "runfiles",
+    #                                      "template_action",
+    #                                      "tokenize",
+    #                                      "new_file",
+    #                                      "outputs",
+    #                                      "check_placeholders"])
 
     jsons = []
     protos = []
@@ -91,7 +118,7 @@ parameterized_info_aspect = aspect(
     # Attributes that the originating rule *MUST* have (see java_info.bzl).
     attrs = {
         # MUST be a string and MUST have a predefined set of values.
-        "java_provider_property": attr.string(
+        "characteristic": attr.string(
             values = ["compilation_info", "annotation_processing"],
         ),
     }

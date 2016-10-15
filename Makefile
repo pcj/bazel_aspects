@@ -1,4 +1,4 @@
-app:
+app_default:
 	bazel build java:app
 
 app_all:
@@ -24,5 +24,8 @@ app_protos:
 	--output_groups=-default,-jsons,+protos \
 	//java:app
 
-java_info:
-	bazel build //java:info
+compilation_info:
+	bazel build //java:compilation_info
+
+annotation_processing:
+	bazel build //java:annotation_processing

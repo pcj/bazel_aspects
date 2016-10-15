@@ -18,8 +18,13 @@ java_library(
 )
 
 java_info(
-    name = "info",
+    name = "annotation_processing",
     deps = ["app"],
-    #java_provider_property = 'compilation_info',
-    java_provider_property = 'annotation_processing',
+    characteristic = 'annotation_processing',
+)
+
+java_info(
+    name = "compilation_info",
+    deps = ["app"],
+    characteristic = 'compilation_info',
 )

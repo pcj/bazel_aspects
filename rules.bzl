@@ -22,7 +22,7 @@ java_info = rule(
 
         # The aspect will be able to see this. This is somewhat like
         # implementing an interface that the aspect requires.
-        "java_provider_property": attr.string(mandatory = True),
+        "characteristic": attr.string(mandatory = True),
 
     },
 )
