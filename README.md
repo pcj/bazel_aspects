@@ -60,7 +60,7 @@ As an aspect implementor, your job is to:
 2. From a rule attribute that declares an aspect (see `java_info`
    rule).
 
-## How to you implement one?
+## How do you implement one?
 
 Writing an aspect rule is similar to writing a normal rule.  There are
 some differences in the types of attributes allowed (labels must be
