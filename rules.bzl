@@ -2,11 +2,11 @@ load("//:aspects.bzl", "parameterized_info_aspect")
 
 def _java_info_impl(ctx):
     """Collect deps from our aspect."""
-    outputs = set()
+    outputs = depset()
 
     for dep in ctx.attr.deps:
         info = dep.info
-        outputs = outputs | info.transitive_jsons | info.transitive_protos
+        outputs = depset(transitive=[outputs, info.transitive_jsons, info.transitive_protos])
 
     return struct(
         files = outputs,
