@@ -1,14 +1,14 @@
 def _visit_java_provider(target, aspect_ctx):
 
     """Dump selective info about a visited java_library or java_binary rule into a file"""
-    java_provider = target.java
+    java_provider = target[JavaInfo]
 
     param = getattr(aspect_ctx.attr, "characteristic", "compilation_info")
     if "compilation_info" == param:
         prop = java_provider.compilation_info
         data = struct(
             boot_classpath = [file.path for file in prop.boot_classpath],
-            compilation_classpath = [file.path for file in prop.compilation_classpath],
+            compilation_classpath = [file.path for file in prop.compilation_classpath.to_list()],
             javac_options = prop.javac_options,
             originating_rule = aspect_ctx.label.name,
         )
@@ -20,11 +20,11 @@ def _visit_java_provider(target, aspect_ctx):
             originating_rule = aspect_ctx.label.name,
         )
 
-    json_file = aspect_ctx.new_file('%s.%s.json' % (target.label.name, param))
-    proto_file = aspect_ctx.new_file('%s.%s.proto' % (target.label.name, param))
+    json_file = aspect_ctx.actions.declare_file('%s.%s.json' % (target.label.name, param))
+    proto_file = aspect_ctx.actions.declare_file('%s.%s.proto' % (target.label.name, param))
 
-    aspect_ctx.file_action(json_file, data.to_json())
-    aspect_ctx.file_action(proto_file, data.to_proto())
+    aspect_ctx.actions.write(json_file, data.to_json())
+    aspect_ctx.actions.write(proto_file, data.to_proto())
 
     return [json_file, proto_file]
 
@@ -83,13 +83,13 @@ def _info_aspect_impl(target, aspect_ctx):
 
     # This is critically important to propogate outputs back up the
     # shadow graph!
-    transitive_jsons = set(jsons)
-    transitive_protos = set(protos)
+    transitive_jsons = depset(jsons)
+    transitive_protos = depset(protos)
 
     for dep in aspect_ctx.rule.attr.deps:
         info = dep.info
-        transitive_jsons = transitive_jsons | info.transitive_jsons
-        transitive_protos = transitive_protos | info.transitive_protos
+        transitive_jsons = depset(transitive=[info.transitive_jsons, transitive_jsons])
+        transitive_protos = depset(transitive=[info.transitive_protos, transitive_protos])
 
     return struct(
         info = struct(
