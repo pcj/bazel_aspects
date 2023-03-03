@@ -31,7 +31,7 @@ https://github.com/bazelbuild/e4b/tree/ae17bdebcb1733ff1cb9172043652668fd85725c/
 When a rule declares an attribute that uses an aspect such as
 `attr.label(aspects = ['foo_aspect']`, bazel looks at the definition
 of the aspect to see what attributes it propogates down.  For example,
-it might say `attr_aspects = ['deps]`.
+it might say `attr_aspects = ['deps']`.
 
 When that rule is invoked, bazel will:
 
